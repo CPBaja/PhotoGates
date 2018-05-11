@@ -6,14 +6,14 @@
 
 #include <PhotoGate.h>
 
-// Constants Declarations and Initializations (Change at will.)
-#define NUMGATES 2	// Number of photogates
+// Constants Declarations and Initializations (Change at will)
+#define NUMGATES 2		// Number of photogates
 
-// DON'T USE PIN 13!!!
-#define CALIBBUTTON 2
-#define RESETBUTTON 3
-#define STATSBUTTON 4
-#define RESETBUTLED 5
+// Don't use pins 0, 1, 13
+#define CALIBBUTTON 3	// Calibration button port
+#define RESETBUTTON 4	// Reset button port
+#define STATSBUTTON 5	// Stats button port
+#define RESETBUTLED 2	// Reset LED port
 
 boolean isTriggered;
 
@@ -26,29 +26,20 @@ void setup() {
 
 	// Initialize photoGate Objects
 	for (unsigned i = 0 ; i < NUMGATES ; ++i) {
-		photoGate[i].init(A0 + i, CALIBBUTTON);
+		photoGate[i].init(A0 + i);
 	}
-	
+
 	// Open serial communications and wait for port to open:
 	Serial.begin(9600);
 	while (!Serial) {
 		;	// Wait for serial port to connect. Needed for native USB port only.
 	}
 
-
-
-	// Calibration button
-	pinMode(CALIBBUTTON, INPUT_PULLUP);
-	
-	// Reset button
-	pinMode(RESETBUTTON, INPUT_PULLUP);
-
-	// Statistics button
-	pinMode(STATSBUTTON, INPUT_PULLUP);
-
-	// Reset Button LED
-	pinMode(RESETBUTLED, OUTPUT);
-	digitalWrite(RESETBUTLED, LOW);
+	// Set pin modes
+	pinMode(CALIBBUTTON, INPUT_PULLUP);	// Calibration button
+	pinMode(RESETBUTTON, INPUT_PULLUP);	// Reset button
+	pinMode(STATSBUTTON, INPUT_PULLUP);	// Stats button
+	pinMode(RESETBUTLED, OUTPUT);		// Reset LED
 
 }
 
@@ -63,7 +54,7 @@ void loop() {
 
 		// Reset all photogate calibrations
 		Serial.println("Resetting all photogate calibrations...");
-		for (int i = 0; i < NUMGATES; i++) {
+		for (unsigned i = 0; i < NUMGATES; ++i) {
 			photoGate[i].resetCal();
 		}
 		Serial.println("All photogate calibrations reset!");
@@ -78,20 +69,33 @@ void loop() {
 
 		// Reset all photogate times		
 		Serial.println("Resetting all photogate times...");
-		for (int i = 0; i < NUMGATES; i++) {
+		for (unsigned i = 0; i < NUMGATES; ++i) {
 			photoGate[i].resetRun();
 		}
 		Serial.println("All photogate timers reset!");
 	}
 
-	
+
 
 	if (digitalRead(STATSBUTTON) == LOW) {
 		Serial.println();
 		Serial.println();
 		Serial.println();
-		
-		for (int i = 0; i < NUMGATES; i++)  {
+
+		for (unsigned i = 0; i < NUMGATES; ++i) {
+			Serial.print("PhotoGate ");
+			Serial.print(i + 1);
+			Serial.print(":");
+			Serial.println();
+			Serial.println("High: " + String(photoGate[i].getHigh()));
+			Serial.println("Low: " + String(photoGate[i].getLow()));
+			Serial.println("Mid: " + String(photoGate[i].getMid()));
+			Serial.println("Light: " + String(photoGate[i].getLight()));
+
+			Serial.println();
+		}
+
+		for (unsigned i = 0; i < NUMGATES; ++i)  {
 			Serial.print("PhotoGate ");
 			Serial.print(i + 1);
 			Serial.print("'s recorded system time is: ");
@@ -99,19 +103,21 @@ void loop() {
 			Serial.println();
 		}
 
+		Serial.println();
 		Serial.print("The elapsed time is: ");
-		Serial.print(photoGate[1].getTime() - photoGate[0].getTime());
-		Serial.print(" microseconds.")
+		Serial.print(String(elaspedTime(), 6));
+		Serial.print(" seconds.");
 		Serial.println();
 
 		// Add motivational code here for slow times.
+
 	}
 
 
 
 	isTriggered = false;
 
-	for (int i = 0; i < NUMGATES; i++) {
+	for (unsigned i = 0; i < NUMGATES; ++i) {
 		photoGate[i].updateAll();
 		isTriggered = isTriggered || photoGate[i].getTime();
 	}
@@ -122,4 +128,10 @@ void loop() {
 		digitalWrite(RESETBUTLED, LOW);
 	}
 
+}
+
+
+
+double elaspedTime() {
+	return (photoGate[1].getTime() - photoGate[0].getTime()) / 1000000.0;
 }
