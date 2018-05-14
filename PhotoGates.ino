@@ -105,7 +105,7 @@ void loop() {
 
 		Serial.println();
 		Serial.print("The elapsed time is: ");
-		Serial.print(String(elaspedTime(), 6));
+		Serial.print(String(elapsedTime(), 6));
 		Serial.print(" seconds.");
 		Serial.println();
 
@@ -132,6 +132,6 @@ void loop() {
 
 
 
-double elaspedTime() {
+double elapsedTime() {
 	return (photoGate[1].getTime() - photoGate[0].getTime()) / 1000000.0;
 }
