@@ -28,7 +28,7 @@
 
 #include <PhotoGate.h>
 
-// Constants Declarations and Initializations (Change at will)
+// Constants Declarations and Initializations (change at will)
 #define NUM_GATES 2		// Number of photogates
 
 // Don't use pins 0, 1, 13
