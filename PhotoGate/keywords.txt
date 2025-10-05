@@ -1,0 +1,5 @@
+PhotoGate		KEYWORD1
+resetCal		KEYWORD2
+resetRun		KEYWORD2
+showStats		KEYWORD2
+updateAll		KEYWORD2
